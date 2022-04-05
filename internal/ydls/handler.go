@@ -141,6 +141,8 @@ func (yh *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Security-Policy", "default-src 'none'; reflected-xss block")
 	w.Header().Set("Content-Type", dr.MIMEType)
+	w.Header().Set("CC-Channel", dr.Channel)
+	w.Header().Set("CC-UploadDate", dr.UploadDate)
 	if dr.Filename != "" {
 		w.Header().Set("Content-Disposition",
 			fmt.Sprintf("attachment; filename*=UTF-8''%s; filename=\"%s\"",

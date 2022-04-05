@@ -331,10 +331,12 @@ type DownloadOptions struct {
 
 // DownloadResult download result
 type DownloadResult struct {
-	Media    io.ReadCloser
-	Filename string
-	MIMEType string
-	waitCh   chan struct{}
+	Media      io.ReadCloser
+	Filename   string
+	Channel    string
+	UploadDate string
+	MIMEType   string
+	waitCh     chan struct{}
 }
 
 // Wait for download resources to cleanup
@@ -511,10 +513,14 @@ func (ydls *YDLS) downloadRaw(ctx context.Context, debugLog Printer, ydlResult g
 	if outFormatName != "" {
 		dr.MIMEType = outFormat.MIMEType
 		dr.Filename = safeFilename(ydlResult.Info.Title + "." + outFormat.Ext)
+		dr.Channel = safeFilename(ydlResult.Info.Channel)
+		dr.UploadDate = safeFilename(ydlResult.Info.UploadDate)
 	} else {
 		outFormatName = "raw"
 		dr.MIMEType = "application/octet-stream"
 		dr.Filename = safeFilename(ydlResult.Info.Title + ".raw")
+		dr.Channel = safeFilename(ydlResult.Info.Channel)
+		dr.UploadDate = safeFilename(ydlResult.Info.UploadDate)
 	}
 
 	log.Printf("Output format: %s (probed %s)", outFormatName, dprc.probeInfo)
@@ -569,6 +575,8 @@ func (ydls *YDLS) downloadFormat(
 
 	dr.MIMEType = options.RequestOptions.Format.MIMEType
 	dr.Filename = safeFilename(ydlResult.Info.Title + "." + options.RequestOptions.Format.Ext)
+	dr.Channel = safeFilename(ydlResult.Info.Channel)
+	dr.UploadDate = safeFilename(ydlResult.Info.UploadDate)
 
 	if options.RequestOptions.Format != nil {
 		log.Printf("Output format: %s", options.RequestOptions.Format.Name)
