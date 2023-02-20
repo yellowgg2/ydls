@@ -8,7 +8,7 @@ require (
 	github.com/fortytw2/leaktest v1.3.0
 	// bump: goutubedl /github.com\/wader\/goutubedl .*-(.*)/ gitrefs:https://github.com/wader/goutubedl.git|re:%refs/heads/master%|@commit|/^(.{12})/
 	// bump: goutubedl command go get -d github.com/wader/goutubedl && go mod tidy
-	github.com/wader/goutubedl v0.0.0-20220316160513-e33f41edf693
+	github.com/wader/goutubedl v0.0.0-20230217162317-c615f6284df0
 	// bump: logutils /github.com\/wader\/logutils .*-(.*)/ gitrefs:https://github.com/wader/logutils.git|re:%refs/heads/master%|@commit|/^(.{12})/
 	// bump: logutils command go get -d github.com/wader/logutils && go mod tidy
 	github.com/wader/logutils v0.0.0-20190904144142-6d88a3144654
@@ -17,5 +17,5 @@ require (
 	github.com/wader/osleaktest v0.0.0-20191111175233-f643b0fed071
 	// bump: sync /golang.org\/x\/sync .*-(.*)/ gitrefs:https://github.com/golang/sync.git|re:%refs/heads/master%|@commit|/^(.{12})/
 	// bump: sync command go get -d golang.org/x/sync && go mod tidy
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0
 )
