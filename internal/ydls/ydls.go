@@ -528,7 +528,7 @@ func (ydls *YDLS) downloadRaw(ctx context.Context, debugLog Printer, ydlResult g
 	} else {
 		outFormatName = "raw"
 		dr.MIMEType = "application/octet-stream"
-		dr.Filename = safeFilename(ydlResult.Info.Title, ".raw")
+		dr.Filename = safeFilename(ydlResult.Info.Title, "raw")
 		dr.Channel = ydlResult.Info.Channel
 		dr.UploadDate = ydlResult.Info.UploadDate
 	}
