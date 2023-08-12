@@ -8,14 +8,14 @@ require (
 	github.com/fortytw2/leaktest v1.3.0
 	// bump: goutubedl /github.com\/wader\/goutubedl .*-(.*)/ gitrefs:https://github.com/wader/goutubedl.git|re:%refs/heads/master%|@commit|/^(.{12})/
 	// bump: goutubedl command go get -d github.com/wader/goutubedl && go mod tidy
-	github.com/wader/goutubedl v0.0.0-20230217162317-c615f6284df0
+	github.com/wader/goutubedl v0.0.0-20230809160717-2d7d4563d9f1
 	// bump: logutils /github.com\/wader\/logutils .*-(.*)/ gitrefs:https://github.com/wader/logutils.git|re:%refs/heads/master%|@commit|/^(.{12})/
 	// bump: logutils command go get -d github.com/wader/logutils && go mod tidy
 	github.com/wader/logutils v0.0.0-20190904144142-6d88a3144654
 	// bump: osleaktest /github.com\/wader\/osleaktest .*-(.*)/ gitrefs:https://github.com/wader/osleaktest.git|re:%refs/heads/master%|@commit|/^(.{12})/
 	// bump: osleaktest command go github.com/wader/osleaktest && go mod tidy
 	github.com/wader/osleaktest v0.0.0-20191111175233-f643b0fed071
-	// bump: sync /golang.org\/x\/sync .*-(.*)/ gitrefs:https://github.com/golang/sync.git|re:%refs/heads/master%|@commit|/^(.{12})/
-	// bump: sync command go get -d golang.org/x/sync && go mod tidy
-	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0
+	// bump: sync /golang.org\/x\/sync v(.*)/ depsdev:go:golang.org/x/sync|*
+	// bump: sync command go get -d golang.org/x/sync@v$LATEST && go mod tidy
+	golang.org/x/sync v0.3.0
 )

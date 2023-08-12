@@ -24,14 +24,15 @@ import (
 func TestSafeFilename(t *testing.T) {
 	for _, c := range []struct {
 		s      string
+		ext    string
 		expect string
 	}{
-		{"aba", "aba"},
-		{"a/a", "a_a"},
-		{"a\\a", "a_a"},
+		{"aba", "ext", "aba.ext"},
+		{"a/a", "ext", "a_a.ext"},
+		{"a\\a", "ext", "a_a.ext"},
 	} {
 		t.Run(c.s, func(t *testing.T) {
-			actual := safeFilename(c.s)
+			actual := safeFilename(c.s + "." + c.ext)
 			if actual != c.expect {
 				t.Errorf("got %v expected %v", actual, c.expect)
 			}
@@ -158,7 +159,8 @@ func TestMissingMediaStream(t *testing.T) {
 	defer leakChecks(t)()
 
 	ydls := ydlsFromEnv(t)
-	const formatName = "mkv"
+	// mxf requires video, soundcloud is audio only
+	const formatName = "mxf"
 	mkvFormat, _ := ydls.Config.Formats.FindByName(formatName)
 
 	ctx, cancelFn := context.WithCancel(context.Background())

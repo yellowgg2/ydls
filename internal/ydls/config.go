@@ -13,9 +13,14 @@ import (
 type Config struct {
 	InputFlags      []string
 	OutputFlags     []string
+	GoutubeDL       GoutubeDLOptions
 	CodecMap        map[string]string
 	Formats         Formats
 	DownloadRetries int
+}
+
+type GoutubeDLOptions struct {
+	Downloader string
 }
 
 // Format media container format, possible codecs, extension and mime
@@ -65,6 +70,7 @@ func (f *Format) UnmarshalJSON(b []byte) (err error) {
 }
 
 type Stream struct {
+	Required  bool
 	Specifier string
 	Codecs    []Codec
 
