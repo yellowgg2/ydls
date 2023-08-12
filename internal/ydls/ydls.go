@@ -109,14 +109,14 @@ func id3v2FramesFromMetadata(m ffmpeg.Metadata, yi goutubedl.Info) []id3v2.Frame
 	return frames
 }
 
-func safeFilename(filename string) string {
+func safeFilename(filename string, ext string) string {
 	// some fs has a max 255 bytes length limit
-	maxFilenameLen := 250
+	maxFilenameLen := 255 - (1 + len(ext))
 	if len(filename) > maxFilenameLen {
 		filename = filename[0:maxFilenameLen]
 	}
 	r := strings.NewReplacer(`/`, `_`, `\`, `_`)
-	return r.Replace(filename)
+	return r.Replace(filename) + "." + ext
 }
 
 // translate youtube-dl codec name to ffmpeg codec name
@@ -522,15 +522,15 @@ func (ydls *YDLS) downloadRaw(ctx context.Context, debugLog Printer, ydlResult g
 
 	if outFormatName != "" {
 		dr.MIMEType = outFormat.MIMEType
-		dr.Filename = safeFilename(ydlResult.Info.Title + "." + outFormat.Ext)
-		dr.Channel = safeFilename(ydlResult.Info.Channel)
-		dr.UploadDate = safeFilename(ydlResult.Info.UploadDate)
+		dr.Filename = safeFilename(ydlResult.Info.Title, outFormat.Ext)
+		dr.Channel = ydlResult.Info.Channel
+		dr.UploadDate = ydlResult.Info.UploadDate
 	} else {
 		outFormatName = "raw"
 		dr.MIMEType = "application/octet-stream"
-		dr.Filename = safeFilename(ydlResult.Info.Title + ".raw")
-		dr.Channel = safeFilename(ydlResult.Info.Channel)
-		dr.UploadDate = safeFilename(ydlResult.Info.UploadDate)
+		dr.Filename = safeFilename(ydlResult.Info.Title, ".raw")
+		dr.Channel = ydlResult.Info.Channel
+		dr.UploadDate = ydlResult.Info.UploadDate
 	}
 
 	log.Printf("Output format: %s (probed %s)", outFormatName, dprc.probeInfo)
@@ -584,9 +584,9 @@ func (ydls *YDLS) downloadFormat(
 	}()
 
 	dr.MIMEType = options.RequestOptions.Format.MIMEType
-	dr.Filename = safeFilename(ydlResult.Info.Title + "." + options.RequestOptions.Format.Ext)
-	dr.Channel = safeFilename(ydlResult.Info.Channel)
-	dr.UploadDate = safeFilename(ydlResult.Info.UploadDate)
+	dr.Filename = safeFilename(ydlResult.Info.Title, options.RequestOptions.Format.Ext)
+	dr.Channel = ydlResult.Info.Channel
+	dr.UploadDate = ydlResult.Info.UploadDate
 
 	if options.RequestOptions.Format != nil {
 		log.Printf("Output format: %s", options.RequestOptions.Format.Name)

@@ -32,7 +32,7 @@ func TestSafeFilename(t *testing.T) {
 		{"a\\a", "ext", "a_a.ext"},
 	} {
 		t.Run(c.s, func(t *testing.T) {
-			actual := safeFilename(c.s + "." + c.ext)
+			actual := safeFilename(c.s, c.ext)
 			if actual != c.expect {
 				t.Errorf("got %v expected %v", actual, c.expect)
 			}
