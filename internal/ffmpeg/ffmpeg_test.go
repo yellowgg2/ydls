@@ -7,8 +7,6 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"io/ioutil"
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -106,14 +104,14 @@ func TestReader(t *testing.T) {
 
 	ffmpegP := &FFmpeg{
 		Streams: []Stream{
-			Stream{
+			{
 				Maps: []Map{
-					Map{
+					{
 						Input:     Reader{Reader: dummy1},
 						Specifier: "a:0",
 						Codec:     AudioCodec("libvorbis"),
 					},
-					Map{
+					{
 						Input:     Reader{Reader: dummy2},
 						Specifier: "v:0",
 						Codec:     VideoCodec("vp8"),
@@ -130,7 +128,9 @@ func TestReader(t *testing.T) {
 	if err := ffmpegP.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	ffmpegP.Wait()
+	if err := ffmpegP.Wait(); err != nil {
+		t.Fatal(err)
+	}
 
 	pi, piErr := Probe(context.Background(), Reader{Reader: bytes.NewBuffer(output.Bytes())}, nil, nil)
 	if piErr != nil {
@@ -156,35 +156,39 @@ func TestURLInput(t *testing.T) {
 	defer leakChecks(t)()
 
 	dummy1 := mustDummy(t, "matroska", "mp3", "h264")
-	tempFile1, tempFile1Err := ioutil.TempFile("", "TestURLInput")
+	tempFile1, tempFile1Err := os.CreateTemp("", "TestURLInput")
 	if tempFile1Err != nil {
-		log.Fatal(tempFile1)
+		t.Fatal(tempFile1)
 	}
 	defer os.Remove(tempFile1.Name())
-	io.Copy(tempFile1, dummy1)
+	if _, err := io.Copy(tempFile1, dummy1); err != nil {
+		t.Fatal(err)
+	}
 	tempFile1.Close()
 
 	dummy2 := mustDummy(t, "matroska", "mp3", "h264")
-	tempFile2, tempFile2Err := ioutil.TempFile("", "TestURLInput")
+	tempFile2, tempFile2Err := os.CreateTemp("", "TestURLInput")
 	if tempFile2Err != nil {
-		log.Fatal(tempFile2Err)
+		t.Fatal(tempFile2Err)
 	}
 	defer os.Remove(tempFile2.Name())
-	io.Copy(tempFile2, dummy2)
+	if _, err := io.Copy(tempFile2, dummy2); err != nil {
+		t.Fatal(err)
+	}
 	tempFile2.Close()
 
 	output := &closeBuffer{}
 
 	ffmpegP := &FFmpeg{
 		Streams: []Stream{
-			Stream{
+			{
 				Maps: []Map{
-					Map{
+					{
 						Input:     URL(tempFile1.Name()),
 						Specifier: "a:0",
 						Codec:     AudioCodec("libvorbis"),
 					},
-					Map{
+					{
 						Input:     URL(tempFile2.Name()),
 						Specifier: "v:0",
 						Codec:     VideoCodec("vp8"),
@@ -201,7 +205,9 @@ func TestURLInput(t *testing.T) {
 	if err := ffmpegP.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	ffmpegP.Wait()
+	if err := ffmpegP.Wait(); err != nil {
+		t.Fatal(err)
+	}
 
 	pi, piErr := Probe(context.Background(), Reader{Reader: bytes.NewBuffer(output.Bytes())}, nil, nil)
 	if piErr != nil {
@@ -232,9 +238,9 @@ func TestWriterOutput(t *testing.T) {
 
 	ffmpegP := &FFmpeg{
 		Streams: []Stream{
-			Stream{
+			{
 				Maps: []Map{
-					Map{
+					{
 						Input:     Reader{Reader: dummy1},
 						Specifier: "a:0",
 						Codec:     AudioCodec("copy"),
@@ -243,9 +249,9 @@ func TestWriterOutput(t *testing.T) {
 				Format: Format{Name: "matroska"},
 				Output: Writer{Writer: outputAudio},
 			},
-			Stream{
+			{
 				Maps: []Map{
-					Map{
+					{
 						Input:     Reader{Reader: dummy1},
 						Specifier: "v:0",
 						Codec:     VideoCodec("copy"),
@@ -262,7 +268,9 @@ func TestWriterOutput(t *testing.T) {
 	if err := ffmpegP.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	ffmpegP.Wait()
+	if err := ffmpegP.Wait(); err != nil {
+		t.Fatal(err)
+	}
 
 	piAudio, piErr := Probe(context.Background(), Reader{Reader: bytes.NewBuffer(outputAudio.Bytes())}, nil, nil)
 	if piErr != nil {

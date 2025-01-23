@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -51,11 +50,6 @@ const (
 	MediaVideo
 	MediaUnknown
 )
-
-func init() {
-	// we're using yt-dlp at the moment
-	goutubedl.Path = "yt-dlp"
-}
 
 func (m mediaType) String() string {
 	switch m {
@@ -473,7 +467,7 @@ func (ydls *YDLS) downloadRSS(
 	if ydlResult.Info.Thumbnail == "" && webpageRawURL != "" {
 		resp, respErr := options.HTTPClient.Get(webpageRawURL)
 		if respErr == nil {
-			body, _ := ioutil.ReadAll(resp.Body)
+			body, _ := io.ReadAll(resp.Body)
 			resp.Body.Close()
 			linkIconRawURL, _ = linkicon.Find(webpageRawURL, string(body))
 		}
@@ -484,7 +478,7 @@ func (ydls *YDLS) downloadRSS(
 
 	// this needs to use a goroutine to have same api as DownloadFormat etc
 	go func() {
-		w.Write([]byte(xml.Header))
+		_, _ = w.Write([]byte(xml.Header))
 		rssRoot := RSSFromYDLSInfo(
 			options,
 			ydlResult.Info,
@@ -492,7 +486,7 @@ func (ydls *YDLS) downloadRSS(
 		)
 		feedWriter := xml.NewEncoder(w)
 		feedWriter.Indent("", "  ")
-		feedWriter.Encode(rssRoot)
+		_ = feedWriter.Encode(rssRoot)
 		w.Close()
 		close(waitCh)
 	}()
@@ -505,7 +499,7 @@ func (ydls *YDLS) downloadRSS(
 }
 
 func (ydls *YDLS) downloadRaw(ctx context.Context, debugLog Printer, ydlResult goutubedl.Result) (DownloadResult, error) {
-	dprc, err := downloadAndProbeFormat(ctx, ydlResult, "best", debugLog)
+	dprc, err := downloadAndProbeFormat(ctx, ydlResult, "", debugLog)
 	if err != nil {
 		return DownloadResult{}, err
 	}
@@ -623,14 +617,14 @@ func (ydls *YDLS) downloadFormat(
 			}
 		} else {
 			if s.Required {
-				return DownloadResult{}, fmt.Errorf("Found no required %s source stream", s.Media)
+				return DownloadResult{}, fmt.Errorf("found no required %s source stream", s.Media)
 			}
 			log.Printf("Found no optional %s source stream, skipping", s.Media)
 		}
 	}
 
 	if len(streamDownloads) == 0 {
-		return DownloadResult{}, fmt.Errorf("No useful source streams found")
+		return DownloadResult{}, fmt.Errorf("no useful source streams found")
 	}
 
 	type downloadProbeResult struct {
@@ -731,7 +725,7 @@ func (ydls *YDLS) downloadFormat(
 			}
 		} else {
 			if sdm.stream.Required {
-				return DownloadResult{}, fmt.Errorf("No media found for required %v stream (%s:%s)",
+				return DownloadResult{}, fmt.Errorf("no media found for required %v stream (%s:%s)",
 					sdm.stream.Media, probeAudioCodec, probeVideoCodec)
 			}
 			log.Printf("No media found for optional %v stream (%s:%s)",
@@ -758,7 +752,7 @@ func (ydls *YDLS) downloadFormat(
 	}
 
 	if len(ffmpegMaps) == 0 {
-		return DownloadResult{}, fmt.Errorf("No media found")
+		return DownloadResult{}, fmt.Errorf("no media found")
 	}
 
 	if !options.RequestOptions.Format.SubtitleCodecs.Empty() && len(ydlResult.Info.Subtitles) > 0 {
@@ -790,7 +784,7 @@ func (ydls *YDLS) downloadFormat(
 				}
 
 				if subtitlesTempDir == "" {
-					tempDir, tempDirErr := ioutil.TempDir("", "ydls-subtitle")
+					tempDir, tempDirErr := os.MkdirTemp("", "ydls-subtitle")
 					if tempDirErr != nil {
 						return DownloadResult{}, fmt.Errorf("failed to create subtitles tempdir: %s", tempDirErr)
 					}
@@ -798,7 +792,7 @@ func (ydls *YDLS) downloadFormat(
 				}
 
 				subtitleFile := filepath.Join(subtitlesTempDir, fmt.Sprintf("%s.%s", subtitle.Language, subtitle.Ext))
-				if err := ioutil.WriteFile(subtitleFile, subtitle.Bytes, 0600); err != nil {
+				if err := os.WriteFile(subtitleFile, subtitle.Bytes, 0600); err != nil {
 					return DownloadResult{}, fmt.Errorf("failed to write subtitle file: %s", err)
 				}
 
@@ -890,7 +884,7 @@ func (ydls *YDLS) downloadFormat(
 		// TODO: ffmpeg mp3enc id3 writer does not work with streamed output
 		// (id3v2 header length update requires seek)
 		if options.RequestOptions.Format.Prepend == "id3v2" {
-			id3v2.Write(w, id3v2FramesFromMetadata(metadata, ydlResult.Info))
+			_, _ = id3v2.Encode(w, id3v2FramesFromMetadata(metadata, ydlResult.Info))
 		}
 		log.Printf("Starting to copy")
 		n, err := io.Copy(w, ffmpegR)
@@ -898,7 +892,7 @@ func (ydls *YDLS) downloadFormat(
 		log.Printf("Copy ffmpeg done (n=%v err=%v)", n, err)
 
 		cleanupOnDoneFn()
-		ffmpegP.Wait()
+		_ = ffmpegP.Wait()
 		ffmpegStderrPW.Close()
 
 		log.Printf("Done")

@@ -14,7 +14,6 @@
     "mp3": "libmp3lame",
     "vorbis": "libvorbis",
     "opus": "libopus",
-    "aac": "libfdk_aac",
     "av1": "libsvtav1"
   },
   "Formats": {
@@ -143,7 +142,9 @@
       ],
       "FormatFlags": [
         "-movflags",
-        "+isml+frag_keyframe"
+        "+isml+frag_keyframe",
+        "-frag_size",
+        "500000"
       ],
       "Streams": [
         {
@@ -167,6 +168,7 @@
           "Codecs": [
             "h264",
             "hevc",
+            "vp9",
             "av1"
           ]
         }
@@ -298,6 +300,22 @@
       ],
       "Ext": "mxf",
       "MIMEType": "application/mxf"
+    },
+    "gif": {
+      "Formats": [
+        "gif"
+      ],
+      "Streams": [
+        {
+          "Required": true,
+          "Specifier": "v:0",
+          "Codecs": [
+            "gif"
+          ]
+        }
+      ],
+      "Ext": "gif",
+      "MIMEType": "image/gif"
     }
   }
 }
