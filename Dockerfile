@@ -1,14 +1,14 @@
 # bump: yt-dlp /YT_DLP=([\d.-]+)/ https://github.com/yt-dlp/yt-dlp.git|/^\d/|sort
 # bump: yt-dlp link "Release notes" https://github.com/yt-dlp/yt-dlp/releases/tag/$LATEST
-ARG YT_DLP=2025.01.15
+ARG YT_DLP=2025.09.05
 # bump: static-ffmpeg /FFMPEG_VERSION=([\d.-]+)/ docker:mwader/static-ffmpeg|/^\d[0-9.-]*$/|sort
-ARG FFMPEG_VERSION=7.1
+ARG FFMPEG_VERSION=8.0
 # bump: golang /GOLANG_VERSION=([\d.]+)/ docker:golang|^1
 # bump: golang link "Release notes" https://golang.org/doc/devel/release.html
-ARG GOLANG_VERSION=1.23.5
+ARG GOLANG_VERSION=1.25.1
 # bump: alpine /ALPINE_VERSION=([\d.]+)/ docker:alpine|^3
 # bump: alpine link "Release notes" https://alpinelinux.org/posts/Alpine-$LATEST-released.html
-ARG ALPINE_VERSION=3.21.2
+ARG ALPINE_VERSION=3.22.1
 
 FROM mwader/static-ffmpeg:$FFMPEG_VERSION AS ffmpeg
 
